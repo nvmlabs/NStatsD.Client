@@ -3,11 +3,18 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.30324.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NStatsD", "NStatsD\NStatsD.csproj", "{EF360062-B063-4E57-9D7F-69062EC824E6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NStatsD", "src\NStatsD\NStatsD.csproj", "{EF360062-B063-4E57-9D7F-69062EC824E6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NStatsD.Client.Demo", "NStatsD.Client.Demo\NStatsD.Client.Demo.csproj", "{4146AEF5-29E5-42D0-95C4-D444AC1F385A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NStatsD.Client.Demo", "src\NStatsD.Client.Demo\NStatsD.Client.Demo.csproj", "{4146AEF5-29E5-42D0-95C4-D444AC1F385A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NStatsD.Client.PerformanceTests", "NStatsD.Client.PerformanceTests\NStatsD.Client.PerformanceTests.csproj", "{49DD2209-3C38-47EE-B27F-71CD8D9B19FC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NStatsD.Client.PerformanceTests", "src\NStatsD.Client.PerformanceTests\NStatsD.Client.PerformanceTests.csproj", "{49DD2209-3C38-47EE-B27F-71CD8D9B19FC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{FC4EE42F-CCD7-407A-AF77-E40BDA1B60C4}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -52,8 +59,5 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(Performance) = preSolution
-		HasPerformanceSessions = true
 	EndGlobalSection
 EndGlobal
