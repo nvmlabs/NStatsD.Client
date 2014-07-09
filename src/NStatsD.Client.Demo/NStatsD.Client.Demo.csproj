@@ -48,9 +48,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\NStatsD\NStatsD.csproj">
+    <ProjectReference Include="..\NStatsD\NStatsD.HighPerformance.csproj">
       <Project>{EF360062-B063-4E57-9D7F-69062EC824E6}</Project>
-      <Name>NStatsD</Name>
+      <Name>NStatsD.HighPerformance</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

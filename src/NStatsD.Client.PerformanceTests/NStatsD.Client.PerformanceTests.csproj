@@ -60,9 +60,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\NStatsD\NStatsD.csproj">
+    <ProjectReference Include="..\NStatsD\NStatsD.HighPerformance.csproj">
       <Project>{ef360062-b063-4e57-9d7f-69062ec824e6}</Project>
-      <Name>NStatsD</Name>
+      <Name>NStatsD.HighPerformance</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -11,9 +11,9 @@ open Fake.FileUtils
 //--------------------------------------------------------------------------------
 
 let product = "NStatsD.HighPerformance"
-let authors = [ "Rob Bihun","Aaron Stannard" ]
+let authors = [ "Rob Bihun";"Aaron Stannard" ]
 let copyright = "Copyright © Aaron Stannard 2013-2014"
-let company = "Akka.net"
+let company = "Rob Bihun"
 let description = "A HIGH PERFORMANCE .NET 4.0 client for Etsy's StatsD server."
 let tags = ["NStatsD";"statsd";".NET graphite";"Helios"]
 let configuration = "Release"
@@ -71,8 +71,7 @@ Target "CopyOutput" (fun _ ->
         let src = "src" @@ project @@ @"bin\release\"
         let dst = binDir @@ project
         CopyDir dst src allFiles
-    [ "Akka.Monitoring"
-      "Akka.Monitoring.StatsD"]
+    [ "NStatsD.HighPerformance"]
     |> List.iter copyOutput
 )
 
@@ -83,6 +82,11 @@ Target "BuildRelease" DoNothing
 //--------------------------------------------------------------------------------
 
 module Nuget = 
+    // add any built-in dependencies for other projects
+    let getDependency project =
+        match project with
+        | _ -> []
+
     // selected nuget description
     let description project =
         match project with
@@ -129,7 +133,7 @@ Target "Nuget" (fun _ ->
                         AccessKey = getBuildParamOrDefault "nugetkey" ""
                         Publish = hasBuildParam "nugetkey"
                         
-                        Dependencies = getDependencies packages })
+                        Dependencies = getDependencies packages @ getDependency project})
                 nuspec
         // pack nuget (with only dll and xml files)
 
