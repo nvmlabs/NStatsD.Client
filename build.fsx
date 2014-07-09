@@ -71,7 +71,7 @@ Target "CopyOutput" (fun _ ->
         let src = "src" @@ project @@ @"bin\release\"
         let dst = binDir @@ project
         CopyDir dst src allFiles
-    [ "NStatsD.HighPerformance"]
+    [ "NStatsD"]
     |> List.iter copyOutput
 )
 
@@ -114,6 +114,7 @@ Target "Nuget" (fun _ ->
         
         let workingDir = binDir @@ "build" @@ project
         let libDir = workingDir @@ @"lib\net40\"    
+        let contentDir = workingDir @@ @"content"
         CleanDir workingDir        
 
         let pack outputDir =
@@ -141,6 +142,10 @@ Target "Nuget" (fun _ ->
         !! (releaseDir @@ project + ".dll")
         ++ (releaseDir @@ project + ".xml")
         |> CopyFiles libDir
+
+        CleanDir contentDir
+        !! (releaseDir @@ "config.transform")
+        |> CopyFiles contentDir
 
         pack nugetDir
 
