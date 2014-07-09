@@ -31,9 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Helios.NET40, Version=1.2.5.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Helios.NET40, Version=1.2.8.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Helios.1.2.5.0\lib\net40\Helios.NET40.dll</HintPath>
+      <HintPath>..\packages\Helios.1.2.8.0\lib\net40\Helios.NET40.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>

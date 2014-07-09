@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using NStatsD;
 
@@ -20,6 +21,11 @@ namespace PerformanceTests
             {
                 Client.Current.Increment("performancetest.increment");
                 i++;
+            }
+            Console.WriteLine("Done queuing messages... waiting for queue to drain");
+            while (Client.Current.Connection.MessagesInSendQueue > 0)
+            {
+                Thread.Sleep(10);
             }
             Console.WriteLine("Done, press any key to exit");
             stopwatch.Stop();
