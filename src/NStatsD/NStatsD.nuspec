@@ -16,8 +16,4 @@
     @dependencies@
     @references@
   </metadata>
-    <files>
-      <file src="content\config.transform" target="content\app.config.transform"/>
-      <file src="content\config.transform" target="content\web.config.transform"/>
-  </files>
 </package>
