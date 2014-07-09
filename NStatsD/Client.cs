@@ -2,24 +2,42 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
-using System.Net.Sockets;
+using System.Net;
+using System.Text;
+using Helios.Net;
+using Helios.Net.Bootstrap;
+using Helios.Serialization;
+using Helios.Topology;
+using Helios.Util;
 
 namespace NStatsD
 {
-    public sealed class Client
+    public sealed class Client : IDisposable
     {
-        Client() { }
+        Client()
+        {
+            ConnectionFactory = new ClientBootstrap().SetTransport(TransportType.Udp)
+                .SetDecoder(new NoOpDecoder()).SetEncoder(new NoOpEncoder()).Build();
+            Host = NodeBuilder.BuildNode().Host(Config.Server.Host).WithPort(Config.Server.Port);
+            Connection = ConnectionFactory.NewConnection(Node.Loopback(), Host);
+            Connection.Open();
+        }
 
         public static Client Current
         {
-            get { return CurrentClient.Instance; }
+            get { return CurrentClient.Instance.Value; }
         }
 
-        class CurrentClient
+        internal readonly IConnectionFactory ConnectionFactory;
+        internal IConnection Connection;
+        internal INode Host;
+        internal readonly object LazyLock = new object();
+
+        static class CurrentClient
         {
             static CurrentClient() { }
 
-            internal static readonly Client Instance = new Client();
+            internal static readonly Lazy<Client> Instance = new Lazy<Client>(() => new Client(), true);
         }
 
         private StatsDConfigurationSection _config;
@@ -29,7 +47,7 @@ namespace NStatsD
             {
                 if (_config == null)
                 {
-                    _config = (StatsDConfigurationSection) ConfigurationManager.GetSection("statsD");
+                    _config = (StatsDConfigurationSection)ConfigurationManager.GetSection("statsD");
                 }
 
                 if (_config == null)
@@ -41,14 +59,14 @@ namespace NStatsD
             }
         }
 
-        private string ValidatePrefix(string prefix) 
+        private string ValidatePrefix(string prefix)
         {
             if (string.IsNullOrWhiteSpace(prefix))
                 return prefix;
 
             if (prefix.EndsWith("."))
                 return prefix;
-                
+
             return string.Format("{0}.", prefix);
         }
 
@@ -114,16 +132,14 @@ namespace NStatsD
             Send(dictionary, sampleRate, callback);
         }
 
-        private readonly Random _random = new Random();
-
         private void Send(Dictionary<string, string> data, double sampleRate, AsyncCallback callback)
         {
             if (!Config.Enabled)
                 return;
-                
+
             if (sampleRate < 1)
             {
-                var nextRand = _random.NextDouble();
+                var nextRand = ThreadLocalRandom.Current.NextDouble(); //offers superior randomization for concurrent systems
                 if (nextRand <= sampleRate)
                 {
                     var sampledData = data.Keys.ToDictionary(stat => stat,
@@ -139,20 +155,46 @@ namespace NStatsD
 
         private void SendToStatsD(Dictionary<string, string> sampledData, AsyncCallback callback)
         {
-            var host = Config.Server.Host;
-            var port = Config.Server.Port;
             var prefix = Config.Prefix;
-            var encoding = new System.Text.ASCIIEncoding();
-
-            using (var client = new UdpClient(host, port))
+            foreach (var stat in sampledData.Keys)
             {
-                foreach (var stat in sampledData.Keys)
-                {
-                    var stringToSend = string.Format("{0}{1}:{2}", prefix, stat, sampledData[stat]);
-                    var sendData =  encoding.GetBytes(stringToSend);
-                    client.BeginSend(sendData, sendData.Length, callback, null);
-                }
+                var stringToSend = string.Format("{0}{1}:{2}", prefix, stat, sampledData[stat]);
+                var sendData = Encoding.ASCII.GetBytes(stringToSend);
+                Connection.Send(sendData, 0, sendData.Length, Host);
             }
         }
+
+        #region IDisposable
+
+        public bool WasDisposed { get; private set; }
+
+        public void Dispose(bool isDisposing)
+        {
+            if (isDisposing && !WasDisposed)
+            {
+                WasDisposed = true;
+                try
+                {
+                    if (!Connection.WasDisposed)
+                    {
+                        Connection.Dispose();
+                    }
+                }
+                catch { }
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+
+        ~Client()
+        {
+            GC.SuppressFinalize(this);
+            Dispose();
+        }
+
+        #endregion
     }
 }
