@@ -1,3 +1,6 @@
+#### 1.1.3 Jul 08 2014
+* NuGet package and build system work out of the box.
+
 #### 1.1.2 Jul 08 2014
 * Fixed config transform
 

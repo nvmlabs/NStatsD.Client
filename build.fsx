@@ -144,7 +144,7 @@ Target "Nuget" (fun _ ->
         |> CopyFiles libDir
 
         CleanDir contentDir
-        !! (releaseDir @@ "config.transform")
+        !! (releaseDir @@ "*.transform")
         |> CopyFiles contentDir
 
         pack nugetDir
