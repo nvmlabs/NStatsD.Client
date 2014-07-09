@@ -19,7 +19,7 @@ namespace NStatsD
             ConnectionFactory = new ClientBootstrap().SetTransport(TransportType.Udp)
                 .SetDecoder(new NoOpDecoder()).SetEncoder(new NoOpEncoder()).Build();
             Host = NodeBuilder.BuildNode().Host(Config.Server.Host).WithPort(Config.Server.Port);
-            Connection = ConnectionFactory.NewConnection(Node.Loopback(), Host);
+            Connection = ConnectionFactory.NewConnection(NodeBuilder.BuildNode().Host(IPAddress.Any).WithPort(0), Host);
             Connection.Open();
         }
 
