@@ -113,7 +113,7 @@ Target "Nuget" (fun _ ->
         let packages = projectDir @@ "packages.config"
         
         let workingDir = binDir @@ "build" @@ project
-        let libDir = workingDir @@ @"lib\net40\"    
+        let libDir = workingDir @@ @"lib\net45\"    
         let contentDir = workingDir @@ @"content"
         CleanDir workingDir        
 
