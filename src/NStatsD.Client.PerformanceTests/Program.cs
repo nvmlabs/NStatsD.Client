@@ -22,11 +22,7 @@ namespace PerformanceTests
                 Client.Current.Increment("performancetest.increment");
                 i++;
             }
-            Console.WriteLine("Done queuing messages... waiting for queue to drain");
-            while (Client.Current.Connection.MessagesInSendQueue > 0)
-            {
-                Thread.Sleep(10);
-            }
+            Console.WriteLine("Done sending messages... waiting for queue to drain");
             Console.WriteLine("Done, press any key to exit");
             stopwatch.Stop();
             Console.WriteLine("Took {0} seconds to complete", stopwatch.Elapsed.TotalSeconds);

@@ -1,3 +1,6 @@
+#### 1.2 Jul 15 2014
+* Removed dependency on Helios
+
 #### 1.1.3 Jul 08 2014
 * NuGet package and build system work out of the box.
 

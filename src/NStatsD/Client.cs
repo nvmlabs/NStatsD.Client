@@ -3,12 +3,9 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Net;
+using System.Net.Sockets;
 using System.Text;
-using Helios.Net;
-using Helios.Net.Bootstrap;
-using Helios.Serialization;
-using Helios.Topology;
-using Helios.Util;
+using System.Threading;
 
 namespace NStatsD
 {
@@ -16,21 +13,22 @@ namespace NStatsD
     {
         Client()
         {
-            ConnectionFactory = new ClientBootstrap().SetTransport(TransportType.Udp)
-                .SetDecoder(new NoOpDecoder()).SetEncoder(new NoOpEncoder()).Build();
-            Host = NodeBuilder.BuildNode().Host(Config.Server.Host).WithPort(Config.Server.Port);
-            Connection = ConnectionFactory.NewConnection(NodeBuilder.BuildNode().Host(IPAddress.Any).WithPort(0), Host);
-            Connection.Open();
+           UdpClient = new UdpClient(Config.Server.Host, Config.Server.Port);
         }
+
+        #region Thread Local Randomization - yields better results for concurrent apps (different seed values on different threads)
+
+        private static int _seed = Environment.TickCount;
+        private static ThreadLocal<Random> _rng = new ThreadLocal<Random>(() => new Random(Interlocked.Increment(ref _seed)));
+
+        #endregion
 
         public static Client Current
         {
             get { return CurrentClient.Instance.Value; }
         }
 
-        internal readonly IConnectionFactory ConnectionFactory;
-        internal IConnection Connection;
-        internal INode Host;
+        internal UdpClient UdpClient;        
         internal readonly object LazyLock = new object();
 
         static class CurrentClient
@@ -139,7 +137,7 @@ namespace NStatsD
 
             if (sampleRate < 1)
             {
-                var nextRand = ThreadLocalRandom.Current.NextDouble(); //offers superior randomization for concurrent systems
+                var nextRand = _rng.Value.NextDouble(); //offers superior randomization for concurrent systems
                 if (nextRand <= sampleRate)
                 {
                     var sampledData = data.Keys.ToDictionary(stat => stat,
@@ -160,7 +158,7 @@ namespace NStatsD
             {
                 var stringToSend = string.Format("{0}{1}:{2}", prefix, stat, sampledData[stat]);
                 var sendData = Encoding.ASCII.GetBytes(stringToSend);
-                Connection.Send(sendData, 0, sendData.Length, Host);
+                UdpClient.BeginSend(sendData, sendData.Length, callback, null);
             }
         }
 
@@ -175,10 +173,7 @@ namespace NStatsD
                 WasDisposed = true;
                 try
                 {
-                    if (!Connection.WasDisposed)
-                    {
-                        Connection.Dispose();
-                    }
+                    using (UdpClient) { }
                 }
                 catch { }
             }

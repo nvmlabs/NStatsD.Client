@@ -134,7 +134,7 @@ Target "Nuget" (fun _ ->
                         AccessKey = getBuildParamOrDefault "nugetkey" ""
                         Publish = hasBuildParam "nugetkey"
                         
-                        Dependencies = getDependencies packages @ getDependency project})
+                        Dependencies = getDependency project})
                 nuspec
         // pack nuget (with only dll and xml files)
 
