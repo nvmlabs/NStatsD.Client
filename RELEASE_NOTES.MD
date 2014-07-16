@@ -1,3 +1,6 @@
+#### 1.2.1 Jul 15 2014
+* Improved performance by making UdpClient.Send call synchronous
+
 #### 1.2 Jul 15 2014
 * Removed dependency on Helios
 

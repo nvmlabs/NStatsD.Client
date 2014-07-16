@@ -158,7 +158,7 @@ namespace NStatsD
             {
                 var stringToSend = string.Format("{0}{1}:{2}", prefix, stat, sampledData[stat]);
                 var sendData = Encoding.ASCII.GetBytes(stringToSend);
-                UdpClient.BeginSend(sendData, sendData.Length, callback, null);
+                UdpClient.Send(sendData, sendData.Length);
             }
         }
 
