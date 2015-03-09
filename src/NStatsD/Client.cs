@@ -18,10 +18,18 @@ namespace NStatsD
         #endregion
 
         internal UdpClient UdpClient;
+        private readonly string _prefix;
+        private readonly bool _enabled;
 
         Client()
         {
-            UdpClient = new UdpClient(Config.Server.Host, Config.Server.Port);
+            var host = GetAppSetting("NStatsD.Host", "localhost");
+            var port = GetAppSetting("NStatsD.Port", 8125);
+            
+            _enabled = GetAppSetting("NStatsD.Enabled", true);
+            _prefix = ValidatePrefix(GetAppSetting("NStatsD.Prefix", ""));
+
+            UdpClient = new UdpClient(host, port);
         }
 
         public static Client Current
@@ -34,25 +42,6 @@ namespace NStatsD
             static CurrentClient() { }
 
             internal static readonly Lazy<Client> Instance = new Lazy<Client>(() => new Client(), true);
-        }
-
-        private StatsDConfigurationSection _config;
-        public StatsDConfigurationSection Config
-        {
-            get
-            {
-                if (_config == null)
-                {
-                    _config = (StatsDConfigurationSection)ConfigurationManager.GetSection("statsD");
-                }
-
-                if (_config == null)
-                    throw new ConfigurationErrorsException("statsD Configuration is not present.");
-
-                _config.Prefix = ValidatePrefix(_config.Prefix);
-
-                return _config;
-            }
         }
 
         private static string ValidatePrefix(string prefix)
@@ -125,7 +114,7 @@ namespace NStatsD
 
         private void Send(Dictionary<string, string> data, double sampleRate)
         {
-            if (!Config.Enabled)
+            if (!_enabled)
                 return;
 
             if (sampleRate < 1)
@@ -146,13 +135,27 @@ namespace NStatsD
 
         private void SendToStatsD(Dictionary<string, string> sampledData)
         {
-            var prefix = Config.Prefix;
             foreach (var stat in sampledData.Keys)
             {
-                var stringToSend = string.Format("{0}{1}:{2}", prefix, stat, sampledData[stat]);
+                var stringToSend = string.Format("{0}{1}:{2}", _prefix, stat, sampledData[stat]);
                 var sendData = Encoding.ASCII.GetBytes(stringToSend);
                 UdpClient.Send(sendData, sendData.Length);
             }
+        }
+
+        private static T GetAppSetting<T>(string key, T defaultValue)
+        {
+            var value = ConfigurationManager.AppSettings[key];
+            try
+            {
+                if (value != null)
+                {
+                    return (T)Convert.ChangeType(value, typeof(T));
+                }
+            }
+            catch { }
+
+            return defaultValue;
         }
 
         #region IDisposable

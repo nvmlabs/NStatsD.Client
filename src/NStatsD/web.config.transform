@@ -1,10 +1,7 @@
 <?xml version="1.0"?>
 <configuration>
-  <configSections>
-    <section name="statsD" type="NStatsD.StatsDConfigurationSection, NStatsD" />
-  </configSections>
-
-  <statsD>
-    <server host="localhost" port="8125" />
-  </statsD>
+  <appSettings>
+    <add key="NStatsD.Host" value="localhost" />
+    <add key="NStatsD.Port" value="8125" />
+  </appSettings>
 </configuration>
