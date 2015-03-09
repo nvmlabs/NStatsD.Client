@@ -1,17 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using NStatsD;
 
 namespace PerformanceTests
 {
     class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
             Console.WriteLine("We're going to write a ton of data to the console. 100k iterations.");
             Console.WriteLine("Going!");
@@ -27,7 +22,6 @@ namespace PerformanceTests
             stopwatch.Stop();
             Console.WriteLine("Took {0} seconds to complete", stopwatch.Elapsed.TotalSeconds);
             Console.ReadKey();
-            return;
         }
     }
 }
